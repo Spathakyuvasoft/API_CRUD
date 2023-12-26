@@ -8,33 +8,13 @@ import {
   Route,
 } from "react-router-dom";
 import { createRoot } from "react-dom/client";
-
-import Table from "./Table";
-import Form from "./Form";
-
-import NoPage from "./NoPage";
+import router from './App.js'
 
 
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Table />,
-  },
-  {
-    path: "/form",
-    element: <Form />,
-  },
-  {
-    path: "/form/:id",
-    element: <Form />,
-  },
-  {
-    path: "*",
-    element: <NoPage />,
-  },
-]);
 
-createRoot(document.getElementById("root")).render(
-  <RouterProvider router={router} />
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );

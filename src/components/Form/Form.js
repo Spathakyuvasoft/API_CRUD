@@ -1,43 +1,38 @@
-import "./index.css";
 import { useState, useEffect } from "react";
-import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
-import './index.css'
+import { Link, useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./Form.css";
 
 const Form = () => {
-  const acesstable = JSON.parse(localStorage.getItem("tabularList"));
-  const editClickedAcess = JSON.parse(localStorage.getItem("editClicked"));
-  const Hidden = JSON.parse(localStorage.getItem("hide"));
   const [formData, setForm] = useState({ name: "", phone: "", email: "" });
-  const [list, setList] = useState([]);
   const [errorObject, seterrorObject] = useState({});
+
   const params = useParams();
-  const [kalsu, setKalsu] = useState(editClickedAcess);
+
   const idAcess = params.id;
+  const navigate = useNavigate();
+  console.log(idAcess);
 
-
-
-
-
-
-  useEffect(() => {
-    if (kalsu) {
-      const Finding = acesstable.find(
-        (each) => parseInt(each.id) === parseInt(idAcess)
+  const acessValues = async () => {
+    try {
+      const valueAcess = await axios.get(
+        `http://localhost:3000/posts/${idAcess}`
       );
-      const { name, phone, email } = Finding;
+      const { name, phone, email } = valueAcess.data;
       setForm({ name, phone, email });
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
+  };
+  useEffect(() => {
+    if (idAcess) {
+      acessValues();
     }
 
     return () => {
       setForm({ name: "", phone: "", email: "" });
     };
-  }, [kalsu]);
-
-
-
-
-
+  }, [idAcess]);
 
   const handle = (event) => {
     const { name, value } = event.target;
@@ -72,36 +67,34 @@ const Form = () => {
     const objectLength = Object.keys(empty1).length;
 
     if (objectLength === 0) {
-      const response = await axios.post('http://localhost:3000/posts', formData);
-      setForm({ name: "", phone: "", email: "" }); 
-     
+      const response = await axios.post(
+        "http://localhost:3000/posts",
+        formData
+      );
+      setForm({ name: "", phone: "", email: "" });
     } else {
       seterrorObject(empty1);
     }
   };
 
-
   const updateRow = async () => {
     try {
-      const response = await axios.put(`http://localhost:3000/posts/${idAcess}`, formData);
+      const response = await axios.put(
+        `http://localhost:3000/posts/${idAcess}`,
+        formData
+      );
 
       setForm({ name: "", phone: "", email: "" });
-      // localStorage.setItem("tabularList", JSON.stringify(formData));
-      localStorage.setItem("editClicked", JSON.stringify(false))
-
-      // console.log('Updated data:', response.data);
     } catch (error) {
-
-      console.error('Error updating data:', error);
+      console.error("Error updating data:", error);
     }
   };
 
   return (
-
     <div className="form">
       <div className="submission">
         <form onSubmit={formSubmit}>
-          <label>Name:</label>
+          <label className="label">Name:</label>
           <br />
           <input
             onChange={handle}
@@ -113,7 +106,7 @@ const Form = () => {
             <p className="Required">{errorObject.name1}</p>
           )}
           <br />
-          <label>phone:</label>
+          <label className="label">phone:</label>
           <br />
           <input
             onChange={handle}
@@ -125,7 +118,7 @@ const Form = () => {
             <p className="Required">{errorObject.phone1}</p>
           )}
           <br />
-          <label>Email:</label>
+          <label className="label">Email:</label>
           <br />
           <input
             onChange={handle}
@@ -138,15 +131,13 @@ const Form = () => {
           )}
           <br />
 
-          {editClickedAcess ? "" : <button type="submit">Submit</button>}
+          {idAcess ? "" : <button type="submit">Submit</button>}
 
-          <Link to="/"><button>Check Table</button></Link>
+          <button onClick={() => navigate("/")}>Check Table</button>
         </form>
-        {Hidden ? ("") : (<button onClick={updateRow}>Update</button>)}
+        {idAcess ? <button onClick={updateRow}>Update</button> : ""}
       </div>
     </div>
-
-
   );
 };
 
